@@ -3,42 +3,50 @@
     <mat-card-header>
       <mat-card-title>Log In</mat-card-title>
     </mat-card-header>
+
     <mat-card-content>
-      {{vypisAuth}}
+      <!-- removed {{vypisAuth}} to avoid showing typed credentials -->
+
       <div>
         <mat-form-field>
           <mat-label>User name</mat-label>
-          <input matInput name="username" [(ngModel)]="auth.name" required minlength="2" #nameField="ngModel">
-          <mat-hint>všetko ok</mat-hint>
+          <input
+            matInput
+            name="username"
+            [(ngModel)]="auth.name"
+            required
+            minlength="2"
+            #nameField="ngModel"
+            placeholder="Enter your username"
+            autocomplete="off"
+          />
+          <mat-hint></mat-hint>
           <mat-error>
             @if(nameField.invalid) {
-              @if(nameField.errors && nameField.errors['required']) {
-                User name is required
-              }
-              @if(nameField.errors && nameField.errors['minlength']) {
-                User name must have at least {{nameField.errors['minlength']['requiredLength']}} characters
-              }
+              @if(nameField.errors && nameField.errors['required']) { User name is required }
+              @if(nameField.errors && nameField.errors['minlength']) { User name must have at least {{nameField.errors['minlength']['requiredLength']}} characters }
             }
           </mat-error>
         </mat-form-field>
       </div>
+
       <div>
         <mat-form-field>
           <mat-label>Enter your password</mat-label>
-          <input matInput name="password" [(ngModel)]="auth.password" [type]="hidePassword() ? 'password' : 'text'" required/>
-          <button
-            type="button"
-            matIconButton
-            matSuffix
-            (click)="toggleHide()"
-            [attr.aria-label]="'Hide password'"
-            [attr.aria-pressed]="hidePassword()"
-          >
-            <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
-          </button>
+          <input
+            matInput
+            name="password"
+            [(ngModel)]="auth.password"
+            type="password"
+            required
+            placeholder="Enter your password"
+            autocomplete="off"
+          />
+          <!-- removed visibility toggle to keep password hidden -->
         </mat-form-field>
       </div>
     </mat-card-content>
+
     <mat-card-actions>
       <button type="submit" matButton="tonal" [disabled]="formModel.invalid">Login</button>
     </mat-card-actions>

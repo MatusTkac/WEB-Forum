@@ -1,14 +1,21 @@
 <mat-toolbar>
-  <span>Users management</span>
-  <a routerLink="/users" routerLinkActive="active" matButton><mat-icon>person</mat-icon>Users</a>
-  <a routerLink="/users-table" routerLinkActive="active" matButton><mat-icon>person</mat-icon>Users table</a>
+  <span>Forum Application</span>
+  <a routerLink="/forum" routerLinkActive="active" matButton>
+    <mat-icon>forum</mat-icon>Forum
+  </a>
+  <a routerLink="/create-post" routerLinkActive="active" matButton>
+    <mat-icon>add</mat-icon>Create Post
+  </a>
   <span class="spacer"></span>
   @let user = loggedUser(); 
   @if(user) {
     <span>{{user}}</span>
-    <button matButton (click)="logout()"><mat-icon>logout</mat-icon>Logout</button>
+    <button matButton (click)="logout()">
+      <mat-icon>logout</mat-icon>Logout
+    </button>
   } @else { 
-    <a routerLink="/register" routerLinkActive="active" matButton><mat-icon>person_add</mat-icon>Register</a>
-    <a routerLink="/login" routerLinkActive="active" matButton><mat-icon>login</mat-icon>Login</a>
+    <a routerLink="/login" routerLinkActive="active" matButton>
+      <mat-icon>login</mat-icon>Login
+    </a>
   }
 </mat-toolbar>

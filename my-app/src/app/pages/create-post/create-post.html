@@ -1,0 +1,53 @@
+<div class="create-post-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Create New Post</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      @if(errorMsg()) {
+        <div class="error-message">
+          <mat-icon>error</mat-icon>
+          {{errorMsg()}}
+        </div>
+      }
+
+      <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title" placeholder="Enter post title" required>
+          @if(postForm.get('title')?.hasError('required') && postForm.get('title')?.touched) {
+            <mat-error>Title is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Content</mat-label>
+          <textarea 
+            matInput 
+            formControlName="text" 
+            placeholder="Write your post content here..."
+            rows="10"
+            required>
+          </textarea>
+          @if(postForm.get('text')?.hasError('required') && postForm.get('text')?.touched) {
+            <mat-error>Content is required</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="cancel()" [disabled]="submitting()">
+            Cancel
+          </button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
+            @if(submitting()) {
+              Creating...
+            } @else {
+              <mat-icon>send</mat-icon> Create Post
+            }
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
