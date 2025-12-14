@@ -1,0 +1,20 @@
+<h2>{{title}}</h2>
+@let errMsg = errorMsg();
+@if(errMsg){
+  <div class="err">{{errMsg}}</div>
+}
+<ul>
+
+  @for (user of users$ | async; track user) {
+    <li (click)="selectUser(user)">{{user}}</li>
+  }
+  @for (user of users(); track user) {
+    <li (click)="selectUser(user)">{{user}}</li>
+  }
+</ul>
+<p>
+  @let selected = selectedUser();
+  @if(selected){
+    Selected user: {{selected.name}}
+  }
+</p>
