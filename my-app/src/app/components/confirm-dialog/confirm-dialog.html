@@ -1,8 +1,16 @@
+<!-- nadpis dialógu - zobrazíme z dát -->
 <h2 mat-dialog-title>{{data.title}}</h2>
+
+<!-- obsah dialógu - správa čo sa má zobraziť -->
 <mat-dialog-content>
   <p>{{data.message}}</p>
 </mat-dialog-content>
+
+<!-- tlačidlá Nie a Áno -->
 <mat-dialog-actions>
+  <!-- tlačidlo Nie - keď klikneme, zavolá funkciu onNoClick() -->
   <button matButton (click)="onNoClick()" cdkFocusInitial>No</button>
+  
+  <!-- tlačidlo Áno - keď klikneme, zatvárame dialog a vraciame true -->
   <button matButton [mat-dialog-close]="true" >Yes</button>
 </mat-dialog-actions>

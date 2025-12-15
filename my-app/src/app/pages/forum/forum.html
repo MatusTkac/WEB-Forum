@@ -1,11 +1,14 @@
 <div class="forum-container">
+  <!-- header s nadpisom a tlačidlom -->
   <div class="forum-header">
     <h1>Forum Posts</h1>
+    <!-- tlačidlo na vytvorenie nového príspevku -->
     <button mat-raised-button color="primary" (click)="goToCreatePost()">
       <mat-icon>add</mat-icon> Create New Post
     </button>
   </div>
 
+  <!-- zobrazenie chybovej správy ak existuje -->
   @if(errorMsg()) {
     <div class="error-message">
       <mat-icon>error</mat-icon>
@@ -13,28 +16,36 @@
     </div>
   }
 
+  <!-- zobrazenie "načítavam..." keď sa sťahujú príspevky -->
   @if(loading()) {
     <div class="loading">Loading posts...</div>
   }
 
+  <!-- zobrazenie "žiadne príspevky" keď sa nič nenačítalo -->
   @if(!loading() && posts().length === 0) {
     <div class="no-posts">
       <p>No posts yet. Be the first to create one!</p>
     </div>
   }
 
+  <!-- zoznam všetkých príspevkov -->
   <div class="posts-list">
+    <!-- for cyklus - pre každý príspevok vytvárame kartu -->
     @for (post of posts(); track post.id) {
       <mat-card class="post-card">
+        <!-- header karty - nadpis a dátum -->
         <mat-card-header>
           <mat-card-title>{{post.title}}</mat-card-title>
+          <!-- dátum formátujeme do čitateľného tvaru -->
           <mat-card-subtitle>
             {{post.createdAt | date:'medium'}}
           </mat-card-subtitle>
         </mat-card-header>
+        <!-- obsah príspevku -->
         <mat-card-content>
           <p>{{post.text}}</p>
         </mat-card-content>
+        <!-- tlačidlo na zmazanie príspevku -->
         <mat-card-actions align="end">
           <button mat-button color="warn" (click)="deletePost(post.id)">
             <mat-icon>delete</mat-icon> Delete

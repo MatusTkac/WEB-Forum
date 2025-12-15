@@ -1,19 +1,36 @@
 <mat-toolbar>
-  <span>Forum Application</span>
+  <!-- nadpis aplikácie -->
+  <span>Forum</span>
+  
+  <!-- prázdne miesto medzi nadpisom a tlačidlami -->
+  <span class="spacer"></span>
+  
+  <!-- odkaz na fórum -->
   <a routerLink="/forum" routerLinkActive="active" matButton>
     <mat-icon>forum</mat-icon>Forum
   </a>
+  
+  <!-- odkaz na vytvorenie nového príspevku -->
   <a routerLink="/create-post" routerLinkActive="active" matButton>
     <mat-icon>add</mat-icon>Create Post
   </a>
+  
+  <!-- prázdne miesto aby sa zvyšok posunul vpravo -->
   <span class="spacer"></span>
+  
+  <!-- premenná na uloženie mena užívateľa -->
   @let user = loggedUser(); 
+  
+  <!-- ak je používateľ prihlásený -->
   @if(user) {
+    <!-- zobrazíme jeho meno -->
     <span>{{user}}</span>
+    <!-- a tlačidlo na odhlásenie -->
     <button matButton (click)="logout()">
       <mat-icon>logout</mat-icon>Logout
     </button>
   } @else { 
+    <!-- ak nie je prihlásený, tlačidlo na login je skryté -->
     <!-- <a routerLink="/login" routerLinkActive="active" matButton>
       <mat-icon>login</mat-icon>Login
     </a> -->
