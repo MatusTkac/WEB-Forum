@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,22 +27,42 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Controller {
 
     private static final String JSON_FILE_PATH = "src/main/resources/posts.json";
+    private static final String JSON_FILE_PATH_FROM_WORKSPACE_ROOT = "forumBE/src/main/resources/posts.json";
     private final ObjectMapper objectMapper;
     private final List<Post> posts = new ArrayList<>();
     private final AtomicLong idCounter = new AtomicLong(1);
+    private final Path jsonFilePath;
 
     public Controller() {
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
         this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        this.jsonFilePath = resolveJsonFilePath();
         
         loadPostsFromFile();
     }
 
+    private Path resolveJsonFilePath() {
+        Path cwd = Paths.get(System.getProperty("user.dir"));
+        Path direct = cwd.resolve(JSON_FILE_PATH);
+        Path workspaceRootStyle = cwd.resolve(JSON_FILE_PATH_FROM_WORKSPACE_ROOT);
+        String cwdName = cwd.getFileName() != null ? cwd.getFileName().toString() : "";
+        boolean runningFromModuleRoot = "forumBE".equalsIgnoreCase(cwdName);
+
+        if (runningFromModuleRoot) {
+            return direct;
+        }
+        if (Files.exists(workspaceRootStyle)) {
+            return workspaceRootStyle;
+        }
+        return direct;
+    }
+
     private void loadPostsFromFile() {
         try {
-            File file = new File(JSON_FILE_PATH);
+            File file = jsonFilePath.toFile();
             if (file.exists()) {
                 List<Post> loadedPosts = objectMapper.readValue(file, new TypeReference<List<Post>>() {});
                 posts.addAll(loadedPosts);
@@ -58,7 +81,11 @@ public class Controller {
 
     private void savePostsToFile() {
         try {
-            File file = new File(JSON_FILE_PATH);
+            File file = jsonFilePath.toFile();
+            File parent = file.getParentFile();
+            if (parent != null) {
+                parent.mkdirs();
+            }
             objectMapper.writeValue(file, posts);
         } catch (IOException e) {
             System.err.println("Error saving posts to file: " + e.getMessage());
@@ -95,6 +122,8 @@ public class Controller {
                 idCounter.getAndIncrement(),
                 request.getTitle(),
                 request.getText(),
+            request.getAuthor(),
+            request.getReplyToId(),
                 LocalDateTime.now()
         );
         posts.add(newPost);
@@ -119,6 +148,8 @@ public class Controller {
         private Long id;
         private String title;
         private String text;
+        private String author;
+        private Long replyToId;
         private LocalDateTime createdAt;
     }
 
@@ -128,5 +159,7 @@ public class Controller {
     static class PostRequest {
         private String title;
         private String text;
+        private String author;
+        private Long replyToId;
     }
 }

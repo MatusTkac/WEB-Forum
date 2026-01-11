@@ -38,7 +38,10 @@
           <mat-card-title>{{post.title}}</mat-card-title>
           <!-- dátum formátujeme do čitateľného tvaru -->
           <mat-card-subtitle>
-            {{post.createdAt | date:'medium'}}
+            by {{post.author || 'unknown'}} • {{post.createdAt | date:'medium'}}
+            @if(post.replyToId) {
+              • reply to {{getReplyLabel(post.replyToId)}}
+            }
           </mat-card-subtitle>
         </mat-card-header>
         <!-- obsah príspevku -->
@@ -47,6 +50,9 @@
         </mat-card-content>
         <!-- tlačidlo na zmazanie príspevku -->
         <mat-card-actions align="end">
+          <button mat-button color="primary" (click)="replyTo(post)">
+            <mat-icon>reply</mat-icon> Reply
+          </button>
           <button mat-button color="warn" (click)="deletePost(post.id)">
             <mat-icon>delete</mat-icon> Delete
           </button>

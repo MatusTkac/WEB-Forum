@@ -84,4 +84,26 @@ export class Forum implements OnInit {
     // navigujeme sa na /create-post
     this.router.navigate(['/create-post']);
   }
+
+  replyTo(post: Post): void {
+    this.router.navigate(['/create-post'], {
+      queryParams: {
+        replyToId: post.id,
+        replyToTitle: post.title,
+        replyToAuthor: post.author || ''
+      }
+    });
+  }
+
+  getPostById(id: number | undefined): Post | undefined {
+    if (id == null) return undefined;
+    return this.posts().find(p => p.id === id);
+  }
+
+  getReplyLabel(replyToId: number | undefined): string {
+    const parent = this.getPostById(replyToId);
+    if (!parent) return replyToId != null ? `#${replyToId}` : '';
+    const author = parent.author || 'unknown';
+    return `#${parent.id} (${author})`;
+  }
 }

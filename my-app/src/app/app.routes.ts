@@ -8,6 +8,7 @@ export const routes: Routes = [
   {path: 'forum', component: Forum},
   {path: 'create-post', component: CreatePost},
   {path: 'login', component: Login},
-  {path: '', pathMatch: 'full', redirectTo: '/forum'},
+  {path: 'users-table', pathMatch: 'full', redirectTo: '/forum'},
+  {path: '', pathMatch: 'full', redirectTo: '/login'},
   {path: '**', component: NotFound}
 ];

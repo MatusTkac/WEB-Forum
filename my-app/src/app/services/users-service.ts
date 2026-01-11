@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { User } from '../entities/user';
-import { catchError, EMPTY, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, EMPTY, map, mergeMap, Observable, of, tap } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Auth } from '../entities/auth';
 import { MessageService } from './message-service';
@@ -16,22 +16,33 @@ export class UsersService {
 //  private token: string = '';
   public loggedUserName = signal<string>('');
   public loggedIn = computed(() => !!this.loggedUserName());
+
+  private get hasLocalStorage(): boolean {
+    return typeof localStorage !== 'undefined';
+  }
   
   private set token(value: string) {
+    if (!this.hasLocalStorage) return;
     localStorage.setItem('umToken', value);
   }
   private get token() {
+    if (!this.hasLocalStorage) return '';
     return localStorage.getItem('umToken') || '';
   }
   private set userName(value: string) {
-    localStorage.setItem('umUserName', value);
+    if (this.hasLocalStorage) {
+      localStorage.setItem('umUserName', value);
+    }
     this.loggedUserName.set(value);
   }
   private get userName() {
+    if (!this.hasLocalStorage) return '';
     return localStorage.getItem('umUserName') || '';
   }
 
-  constructor(private http: HttpClient){}
+  constructor(private http: HttpClient){
+    this.loggedUserName.set(this.userName);
+  }
 
   getUsersSimple(): User[] {
     return this.users;
@@ -62,14 +73,22 @@ export class UsersService {
   }
 
   login(auth:Auth): Observable<boolean> {
-    return this.http.post('http://localhost:8080/login', auth, {responseType: 'text'}).pipe(
-      tap(token => {
-        this.token = token;
-        this.userName = auth.name;
+    return this.http.get<User[]>('/users.json').pipe(
+      map(jsonUsers => jsonUsers.map(user => User.clone(user))),
+      map(users => users.find(u => u.name === auth.name && u.password === auth.password) || null),
+      tap(user => {
+        if (user) {
+          this.token = 'mock-token';
+          this.userName = auth.name;
+        }
       }),
-      map(token => {
+      mergeMap(user => {
+        if (!user) {
+          this.messageService.printError('Invalid username or password');
+          return EMPTY;
+        }
         this.messageService.printInfo("Login successfull");
-        return true;
+        return of(true);
       }),
       catchError(err => this.processErrors(err))
     );
@@ -123,8 +142,20 @@ export class UsersService {
         return EMPTY;    
       }
       if (err.status < 500) {
-        const msg = err.error.errorMessage ? err.error.errorMessage : JSON.parse(err.error).errorMessage;
-        this.messageService.printError(msg);
+        let msg: string | undefined;
+        if (err.error && typeof err.error === 'object' && 'errorMessage' in err.error) {
+          msg = (err.error as any).errorMessage;
+        } else if (typeof err.error === 'string') {
+          try {
+            msg = JSON.parse(err.error).errorMessage;
+          } catch {
+            msg = err.message;
+          }
+        } else {
+          msg = err.message;
+        }
+
+        this.messageService.printError(msg || 'Request failed');
         return EMPTY; 
       }
       this.messageService.printError("Server error, contact administrator");

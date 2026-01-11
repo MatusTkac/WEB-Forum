@@ -1,0 +1,16 @@
+[
+  {
+    "name": "admin1",
+    "email": "admin1@example.com",
+    "active": true,
+    "password": "admin1pass",
+    "groups": []
+  },
+  {
+    "name": "admin2",
+    "email": "admin2@example.com",
+    "active": true,
+    "password": "admin2pass",
+    "groups": []
+  }
+]
