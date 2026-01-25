@@ -1,10 +1,15 @@
+<!-- Create/Edit Post Page Container -->
 <div class="create-post-container">
+  <!-- Material Design Card - contains the entire form -->
   <mat-card>
+    <!-- Card Header - title changes based on mode (Create vs Edit) -->
     <mat-card-header>
-      <mat-card-title>Create New Post</mat-card-title>
+      <mat-card-title>{{isEditMode() ? 'Edit Post' : 'Create New Post'}}</mat-card-title>
     </mat-card-header>
     
+    <!-- Card Content - contains error message and form -->
     <mat-card-content>
+      <!-- Error Message - only shows if there's an error -->
       @if(errorMsg()) {
         <div class="error-message">
           <mat-icon>error</mat-icon>
@@ -12,15 +17,38 @@
         </div>
       }
 
+      <!-- Form - uses reactive forms with validation -->
+      <!-- When submitted, calls onSubmit() function -->
       <form [formGroup]="postForm" (ngSubmit)="onSubmit()">
+        <!-- Title Input Field -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Title</mat-label>
           <input matInput formControlName="title" placeholder="Enter post title" required>
+          <!-- Error message - shows if title is empty and user touched the field -->
           @if(postForm.get('title')?.hasError('required') && postForm.get('title')?.touched) {
             <mat-error>Title is required</mat-error>
           }
         </mat-form-field>
 
+        <!-- Category Dropdown Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Category</mat-label>
+          <mat-select formControlName="category" required>
+            <mat-option>-- Select a category --</mat-option>
+            <!-- Loop through all available categories -->
+            @for (category of categories(); track category.id) {
+              <mat-option [value]="category.name">
+                <strong>{{category.name}}</strong> - {{category.description}}
+              </mat-option>
+            }
+          </mat-select>
+          <!-- Error message - shows if category not selected -->
+          @if(postForm.get('category')?.hasError('required') && postForm.get('category')?.touched) {
+            <mat-error>Category is required</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Content Text Area Field - for post body -->
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Content</mat-label>
           <textarea 
@@ -30,20 +58,26 @@
             rows="10"
             required>
           </textarea>
+          <!-- Error message - shows if content is empty -->
           @if(postForm.get('text')?.hasError('required') && postForm.get('text')?.touched) {
             <mat-error>Content is required</mat-error>
           }
         </mat-form-field>
 
+        <!-- Form Action Buttons -->
         <div class="form-actions">
+          <!-- Cancel Button - goes back to forum without saving -->
           <button mat-button type="button" (click)="cancel()" [disabled]="submitting()">
             Cancel
           </button>
+          <!-- Submit Button - text changes based on mode (Create vs Update) -->
           <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
+            <!-- Show loading text while submitting -->
             @if(submitting()) {
-              Creating...
+              {{isEditMode() ? 'Updating...' : 'Creating...'}}
             } @else {
-              <mat-icon>send</mat-icon> Create Post
+              <!-- Show icon and button text based on mode -->
+              <mat-icon>{{isEditMode() ? 'save' : 'send'}}</mat-icon> {{isEditMode() ? 'Update Post' : 'Create Post'}}
             }
           </button>
         </div>

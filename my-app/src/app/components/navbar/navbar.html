@@ -1,36 +1,37 @@
+<!-- Navigation Toolbar - appears at top of every page -->
 <mat-toolbar>
-  <!-- nadpis aplikácie -->
+  <!-- App title/logo -->
   <span>Forum</span>
   
-  <!-- prázdne miesto medzi nadpisom a tlačidlami -->
+  <!-- Spacer - pushes navigation links to the right -->
   <span class="spacer"></span>
   
-  <!-- odkaz na fórum -->
+  <!-- Link to Forum page - highlighted when active -->
   <a routerLink="/forum" routerLinkActive="active" matButton>
     <mat-icon>forum</mat-icon>Forum
   </a>
   
-  <!-- odkaz na vytvorenie nového príspevku -->
+  <!-- Link to Create Post page - highlighted when active -->
   <a routerLink="/create-post" routerLinkActive="active" matButton>
     <mat-icon>add</mat-icon>Create Post
   </a>
   
-  <!-- prázdne miesto aby sa zvyšok posunul vpravo -->
+  <!-- Spacer - pushes user info to far right -->
   <span class="spacer"></span>
   
-  <!-- premenná na uloženie mena užívateľa -->
+  <!-- Store current username in variable -->
   @let user = loggedUser(); 
   
-  <!-- ak je používateľ prihlásený -->
+  <!-- Show user info only if logged in -->
   @if(user) {
-    <!-- zobrazíme jeho meno -->
+    <!-- Display username -->
     <span>{{user}}</span>
-    <!-- a tlačidlo na odhlásenie -->
+    <!-- Logout button - calls logout() function -->
     <button matButton (click)="logout()">
       <mat-icon>logout</mat-icon>Logout
     </button>
   } @else { 
-    <!-- ak nie je prihlásený, tlačidlo na login je skryté -->
+    <!-- If not logged in, login button is hidden (commented out) -->
     <!-- <a routerLink="/login" routerLinkActive="active" matButton>
       <mat-icon>login</mat-icon>Login
     </a> -->

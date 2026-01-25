@@ -1,0 +1,15 @@
+[ {
+  "id" : 2,
+  "name" : "Guest2",
+  "email" : "email@gmail.com",
+  "password" : "pass123",
+  "active" : true,
+  "lastLogin" : "2026-01-25T13:06:46.7154884"
+}, {
+  "id" : 1,
+  "name" : "Guest1",
+  "email" : "emailik@gmail.com",
+  "password" : "pass123",
+  "active" : true,
+  "lastLogin" : "2026-01-25T13:10:00.5224522"
+} ]

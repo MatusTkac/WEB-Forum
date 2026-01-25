@@ -1,12 +1,10 @@
-package com.example.forumBE;
+package com.example.forumBE.controller;
 
+import com.example.forumBE.service.CategoryService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
-public class Controller {
+public class PostController {
 
     private static final String JSON_FILE_PATH = "src/main/resources/posts.json";
     private static final String JSON_FILE_PATH_FROM_WORKSPACE_ROOT = "forumBE/src/main/resources/posts.json";
@@ -32,8 +30,10 @@ public class Controller {
     private final List<Post> posts = new ArrayList<>();
     private final AtomicLong idCounter = new AtomicLong(1);
     private final Path jsonFilePath;
+    private final CategoryService categoryService;
 
-    public Controller() {
+    public PostController(CategoryService categoryService) {
+        this.categoryService = categoryService;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
         this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -117,6 +117,13 @@ public class Controller {
         if (request.getText() == null || request.getText().trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
+        
+        // Validate category
+        if (request.getCategory() != null && !request.getCategory().trim().isEmpty()) {
+            if (!categoryService.isValidCategory(request.getCategory())) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
 
         Post newPost = new Post(
                 idCounter.getAndIncrement(),
@@ -124,11 +131,43 @@ public class Controller {
                 request.getText(),
             request.getAuthor(),
             request.getReplyToId(),
+            request.getCategory(),
                 LocalDateTime.now()
         );
         posts.add(newPost);
         savePostsToFile();
         return ResponseEntity.status(HttpStatus.CREATED).body(newPost);
+    }
+
+    @PutMapping("/posts/{id}")
+    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
+        if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        if (request.getText() == null || request.getText().trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        // Validate category
+        if (request.getCategory() != null && !request.getCategory().trim().isEmpty()) {
+            if (!categoryService.isValidCategory(request.getCategory())) {
+                return ResponseEntity.badRequest().build();
+            }
+        }
+        
+        for (Post post : posts) {
+            if (post.getId().equals(id)) {
+                post.setTitle(request.getTitle());
+                post.setText(request.getText());
+                post.setCategory(request.getCategory());
+                if (request.getAuthor() != null) {
+                    post.setAuthor(request.getAuthor());
+                }
+                savePostsToFile();
+                return ResponseEntity.ok(post);
+            }
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/posts/{id}")
@@ -141,25 +180,79 @@ public class Controller {
         return ResponseEntity.notFound().build();
     }
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
     static class Post {
         private Long id;
         private String title;
         private String text;
         private String author;
         private Long replyToId;
+        private String category;
         private LocalDateTime createdAt;
+
+        public Post() {}
+
+        public Post(Long id, String title, String text, String author, Long replyToId, String category, LocalDateTime createdAt) {
+            this.id = id;
+            this.title = title;
+            this.text = text;
+            this.author = author;
+            this.replyToId = replyToId;
+            this.category = category;
+            this.createdAt = createdAt;
+        }
+
+        public Long getId() { return id; }
+        public void setId(Long id) { this.id = id; }
+
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+
+        public String getText() { return text; }
+        public void setText(String text) { this.text = text; }
+
+        public String getAuthor() { return author; }
+        public void setAuthor(String author) { this.author = author; }
+
+        public Long getReplyToId() { return replyToId; }
+        public void setReplyToId(Long replyToId) { this.replyToId = replyToId; }
+
+        public String getCategory() { return category; }
+        public void setCategory(String category) { this.category = category; }
+
+        public LocalDateTime getCreatedAt() { return createdAt; }
+        public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
     static class PostRequest {
         private String title;
         private String text;
         private String author;
         private Long replyToId;
+        private String category;
+
+        public PostRequest() {}
+
+        public PostRequest(String title, String text, String author, Long replyToId, String category) {
+            this.title = title;
+            this.text = text;
+            this.author = author;
+            this.replyToId = replyToId;
+            this.category = category;
+        }
+
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+
+        public String getText() { return text; }
+        public void setText(String text) { this.text = text; }
+
+        public String getAuthor() { return author; }
+        public void setAuthor(String author) { this.author = author; }
+
+        public Long getReplyToId() { return replyToId; }
+        public void setReplyToId(Long replyToId) { this.replyToId = replyToId; }
+
+        public String getCategory() { return category; }
+        public void setCategory(String category) { this.category = category; }
     }
 }

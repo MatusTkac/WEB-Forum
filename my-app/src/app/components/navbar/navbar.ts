@@ -5,23 +5,24 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { UsersService } from '../../services/users-service';
 
-// Komponenta pre navigačný panel - asi len horná lišta s tlačidlami
+// Navbar Component - top navigation bar displayed on all pages
+// Shows app title, navigation links, username, and logout button
 @Component({
   selector: 'app-navbar',
-  // importujeme Material moduly aby sme mohli používať tlačidla, ikony a toolbar
+  // Import Material modules for toolbar, buttons, and icons
   imports: [MatToolbarModule, MatIcon, MatButtonModule, RouterLink, RouterLinkActive],
-  templateUrl: './navbar.html', // HTML šablóna pre navigáciu
-  styleUrl: './navbar.scss' // CSS štýly pre navigáciu
+  templateUrl: './navbar.html',
+  styleUrl: './navbar.scss'
 })
 export class Navbar {
-  // servisa ktorý má na starosti užívateľov
+  // Service to check login status and handle logout
   usersService = inject(UsersService);
-  // router pre navigáciu medzi stránkami
+  // Router for navigation after logout
   router = inject(Router);
-  // berieme si meno prihláseneho užívateľa z usersService
+  // Get current logged in username from service
   loggedUser = this.usersService.loggedUserName;
   
-  // funkcia na odhlásenie - asi vyčisti údaje a pošle nás na login
+  // Logout function - clears user session and redirects to login
   logout() {
     this.usersService.logout().subscribe(success => this.router.navigateByUrl('/login'));
   }

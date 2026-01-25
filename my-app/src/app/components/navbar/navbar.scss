@@ -1,6 +1,49 @@
+mat-toolbar {
+  background: white !important;
+  box-shadow: 0 1px 0 0 #EBEBEB;
+  padding: 16px 80px;
+  height: 80px;
+  border-bottom: 1px solid #EBEBEB;
+
+  a, button {
+    margin: 0 12px;
+    border-radius: 22px;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: none;
+    transition: all 0.2s ease;
+    padding: 10px 16px;
+    height: auto;
+    color: #222222;
+
+    &:hover {
+      background: #F7F7F7;
+    }
+  }
+
+  .brand {
+    font-size: 20px;
+    font-weight: 600;
+    color: #FF385C;
+    text-decoration: none;
+    margin-right: 40px;
+    letter-spacing: -0.5px;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+
 .spacer {
   flex: 1 1 auto;
 }
+
 .active {
-  background-color: rgba(0,0,0,0.2);
+  background: #F7F7F7 !important;
+  color: #222222 !important;
+
+  &:hover {
+    background: #EBEBEB !important;
+  }
 }

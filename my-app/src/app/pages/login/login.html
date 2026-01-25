@@ -1,21 +1,36 @@
+<!-- Login Form - This is the entire login page -->
+<!-- When user clicks Login button, the submit() function is called -->
 <form (ngSubmit)="submit()" #formModel="ngForm">
+  <!-- Material Design Card - makes a nice looking box for the login form -->
   <mat-card class="login-card" appearance="outlined">
+    <!-- Card Header - shows "Log In" title at the top -->
     <mat-card-header>
       <mat-card-title>Log In</mat-card-title>
     </mat-card-header>
 
+    <!-- Card Content - the main body with input fields -->
     <mat-card-content>
-      {{vypisAuth}}
+      <!-- Error Message Display - only shows if there's an error -->
+      @if(errorMessage()) {
+        <div class="error-message">
+          <mat-icon>error</mat-icon>
+          {{errorMessage()}}
+        </div>
+      }
+      <!-- Username Input Field -->
       <div>
         <mat-form-field>
           <mat-label>User name</mat-label>
+          <!-- Input box - connected to auth.name, minimum 2 characters required -->
           <input matInput name="username" [(ngModel)]="auth.name" required minlength="2" #nameField="ngModel">
-          <mat-hint>všetko ok</mat-hint>
+          <!-- Error messages - shown when username is invalid -->
           <mat-error>
             @if(nameField.invalid) {
+              <!-- Shows if username is empty -->
               @if(nameField.errors && nameField.errors['required']) {
                 User name is required
               }
+              <!-- Shows if username is too short (less than 2 characters) -->
               @if(nameField.errors && nameField.errors['minlength']) {
                 User name must have at least {{nameField.errors['minlength']['requiredLength']}} characters
               }
@@ -23,10 +38,13 @@
           </mat-error>
         </mat-form-field>
       </div>
+      <!-- Password Input Field -->
       <div>
         <mat-form-field>
           <mat-label>Enter your password</mat-label>
+          <!-- Password input - can toggle between hidden (***) and visible text -->
           <input matInput name="password" [(ngModel)]="auth.password" [type]="hidePassword() ? 'password' : 'text'" required/>
+          <!-- Toggle Password Visibility Button - eye icon to show/hide password -->
           <button
             type="button"
             matIconButton
@@ -35,12 +53,15 @@
             [attr.aria-label]="'Hide password'"
             [attr.aria-pressed]="hidePassword()"
           >
+            <!-- Shows eye icon (visibility_off = hidden, visibility = visible) -->
             <mat-icon>{{hidePassword() ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
         </mat-form-field>
       </div>
     </mat-card-content>
+    <!-- Card Actions - contains the Login button -->
     <mat-card-actions>
+      <!-- Login Button - disabled if form is invalid (empty or too short username) -->
       <button type="submit" matButton="tonal" [disabled]="formModel.invalid">Login</button>
     </mat-card-actions>
   </mat-card>

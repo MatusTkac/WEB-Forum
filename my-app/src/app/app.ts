@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { Forum } from './pages/forum/forum';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Navbar } from "../app/components/navbar/navbar";
+import { inject } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -12,4 +13,9 @@ import { Navbar } from "../app/components/navbar/navbar";
 export class App {
   protected readonly title = signal('my-app');
   name:string = 'Peter';
+  router = inject(Router);
+
+  isLoginPage(): boolean {
+    return this.router.url === '/login' || this.router.url === '/';
+  }
 }

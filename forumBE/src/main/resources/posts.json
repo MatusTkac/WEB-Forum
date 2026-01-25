@@ -1,0 +1,17 @@
+[ {
+  "id" : 1,
+  "title" : "Very gud weather",
+  "text" : "Very guud veter today, my ski gud priprredr",
+  "author" : "Guest1",
+  "replyToId" : null,
+  "category" : "Announcements",
+  "createdAt" : "2026-01-25T12:54:21.8004002"
+}, {
+  "id" : 3,
+  "title" : "How many bits is in one byte?",
+  "text" : "ow many bits is in one byte?\n\nalredy know the answear thanks\n\nsom rad ze som rad",
+  "author" : "Guest2",
+  "replyToId" : null,
+  "category" : "Technology",
+  "createdAt" : "2026-01-25T12:55:38.5801857"
+} ]
