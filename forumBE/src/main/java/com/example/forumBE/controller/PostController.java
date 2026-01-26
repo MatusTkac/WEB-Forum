@@ -1,6 +1,7 @@
 package com.example.forumBE.controller;
 
 import com.example.forumBE.service.CategoryService;
+import com.example.forumBE.service.UserService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -16,7 +17,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
@@ -31,9 +34,11 @@ public class PostController {
     private final AtomicLong idCounter = new AtomicLong(1);
     private final Path jsonFilePath;
     private final CategoryService categoryService;
+    private final UserService userService;
 
-    public PostController(CategoryService categoryService) {
+    public PostController(CategoryService categoryService, UserService userService) {
         this.categoryService = categoryService;
+        this.userService = userService;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
         this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -140,7 +145,19 @@ public class PostController {
     }
 
     @PutMapping("/posts/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody PostRequest request) {
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostRequest request, @RequestHeader("Authorization") String token) {
+        // Validate token
+        if (!userService.isValidToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(createErrorResponse("Invalid or expired token"));
+        }
+        
+        String currentUsername = userService.getUsernameFromToken(token);
+        if (currentUsername == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(createErrorResponse("Invalid token"));
+        }
+        
         if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
@@ -157,12 +174,15 @@ public class PostController {
         
         for (Post post : posts) {
             if (post.getId().equals(id)) {
+                // Check if the current user is the author of the post
+                if (!currentUsername.equals(post.getAuthor())) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                            .body(createErrorResponse("You can only edit your own posts"));
+                }
+                
                 post.setTitle(request.getTitle());
                 post.setText(request.getText());
                 post.setCategory(request.getCategory());
-                if (request.getAuthor() != null) {
-                    post.setAuthor(request.getAuthor());
-                }
                 savePostsToFile();
                 return ResponseEntity.ok(post);
             }
@@ -171,13 +191,44 @@ public class PostController {
     }
 
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
-        boolean removed = posts.removeIf(post -> post.getId().equals(id));
-        if (removed) {
-            savePostsToFile(); // Save to JSON file
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletePost(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        // Validate token
+        if (!userService.isValidToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(createErrorResponse("Invalid or expired token"));
         }
-        return ResponseEntity.notFound().build();
+        
+        String currentUsername = userService.getUsernameFromToken(token);
+        if (currentUsername == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(createErrorResponse("Invalid token"));
+        }
+        
+        // Find the post and check ownership
+        Post postToDelete = posts.stream()
+                .filter(post -> post.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+        
+        if (postToDelete == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        // Check if the current user is the author of the post
+        if (!currentUsername.equals(postToDelete.getAuthor())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(createErrorResponse("You can only delete your own posts"));
+        }
+        
+        posts.remove(postToDelete);
+        savePostsToFile();
+        return ResponseEntity.noContent().build();
+    }
+
+    private Map<String, String> createErrorResponse(String message) {
+        Map<String, String> error = new HashMap<>();
+        error.put("errorMessage", message);
+        return error;
     }
 
     static class Post {
