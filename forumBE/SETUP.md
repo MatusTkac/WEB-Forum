@@ -1,7 +1,7 @@
 # Backend Setup
 
 ## Prerequisites
-- **Java 21** - Download from https://adoptium.net/temurin/releases/ (choose JDK 21, Windows x64 installer)
+- **Java 21** - Download from https://www.oracle.com/java/technologies/downloads/#jdk21-windows (choose JDK 21, Windows x64 installer)
 
 ## Installation
 1. Install Java 21 and ensure `JAVA_HOME` is set (installer usually does this)
