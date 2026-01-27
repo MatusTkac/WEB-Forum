@@ -1,0 +1,76 @@
+<div class="thread-container">
+  <div class="thread-header">
+    <button mat-button (click)="backToForum()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Forum
+    </button>
+  </div>
+
+  @if(errorMsg()) {
+    <div class="error-message">
+      <mat-icon>error</mat-icon>
+      {{errorMsg()}}
+    </div>
+  }
+
+  @if(loading()) {
+    <div class="loading">Loading post and replies...</div>
+  }
+
+  @if(!loading() && post()) {
+    <mat-card class="post-card">
+      <mat-card-header>
+        <mat-card-title>
+          {{post()!.title}}
+          @if(post()!.category) {
+            <span class="category-badge">{{post()!.category}}</span>
+          }
+        </mat-card-title>
+        <mat-card-subtitle>
+          by {{post()!.author || 'unknown'}} • {{post()!.createdAt | date:'medium'}}
+          • {{getReplyCount()}} replies
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{post()!.text}}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="reply-form">
+      <h3>Write a Reply</h3>
+      <form [formGroup]="replyForm" (ngSubmit)="submitReply()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title" placeholder="Reply title">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Text</mat-label>
+          <textarea matInput rows="4" formControlName="text" placeholder="Write your reply..."></textarea>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit">Post Reply</button>
+      </form>
+    </div>
+
+    <div class="replies-section">
+      <h3>Replies</h3>
+      @if(replies().length === 0) {
+        <div class="no-replies">No replies yet. Be the first!</div>
+      }
+      @for (reply of replies(); track reply.id) {
+        <mat-card class="reply-card">
+          <mat-card-header>
+            <mat-card-title>{{reply.title}}</mat-card-title>
+            <mat-card-subtitle>
+              by {{reply.author || 'unknown'}} • {{reply.createdAt | date:'medium'}}
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p>{{reply.text}}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,46 @@
+.thread-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.thread-header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+
+.post-card {
+  margin-bottom: 24px;
+}
+
+.category-badge {
+  margin-left: 8px;
+  padding: 2px 8px;
+  background-color: #e0e0e0;
+  border-radius: 12px;
+  font-size: 0.8rem;
+}
+
+.reply-form {
+  margin-bottom: 24px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.replies-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reply-card {
+  border-left: 3px solid #1976d2;
+}
+
+.no-replies {
+  color: #666;
+  margin: 8px 0 16px;
+}

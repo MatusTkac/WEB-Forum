@@ -46,7 +46,7 @@
     <!-- Loop through each post and create a card -->
     @for (post of posts(); track post.id) {
       <!-- Material Design Card for each post -->
-      <mat-card class="post-card">
+      <mat-card class="post-card" (click)="openThread(post)">
         <!-- Card Header - title, category badge, author, and date -->
         <mat-card-header>
           <mat-card-title>
@@ -59,10 +59,8 @@
           <!-- Post Metadata - author, date, and reply info -->
           <mat-card-subtitle>
             by {{post.author || 'unknown'}} • {{post.createdAt | date:'medium'}}
-            <!-- Shows if this post is a reply to another post -->
-            @if(post.replyToId) {
-              • reply to {{getReplyLabel(post.replyToId)}}
-            }
+            <!-- Show number of replies for top-level posts -->
+            • {{getReplyCount(post.id)}} replies
           </mat-card-subtitle>
         </mat-card-header>
         <!-- Card Content - the post text/body -->
@@ -72,15 +70,15 @@
         <!-- Card Actions - buttons for Reply, Edit, Delete -->
         <mat-card-actions align="end">
           <!-- Reply Button - always visible to everyone -->
-          <button mat-button color="primary" (click)="replyTo(post)">
+          <button mat-button color="primary" (click)="replyTo(post); $event.stopPropagation()">
             <mat-icon>reply</mat-icon> Reply
           </button>
           <!-- Edit and Delete Buttons - only show if current user is the author -->
           @if(canModifyPost(post)) {
-            <button mat-button (click)="editPost(post)">
+            <button mat-button (click)="editPost(post); $event.stopPropagation()">
               <mat-icon>edit</mat-icon> Edit
             </button>
-            <button mat-button color="warn" (click)="deletePost(post.id)">
+            <button mat-button color="warn" (click)="deletePost(post.id); $event.stopPropagation()">
               <mat-icon>delete</mat-icon> Delete
             </button>
           }

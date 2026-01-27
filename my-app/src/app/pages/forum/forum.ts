@@ -70,7 +70,9 @@ export class Forum implements OnInit {
       next: posts => {
         // Store posts
         this.allPosts.set(posts);
-        this.posts.set(posts);
+        // Show only top-level posts (exclude replies)
+        const topLevel = posts.filter(p => !p.replyToId);
+        this.posts.set(topLevel);
         // Hide loading indicator
         this.loading.set(false);
       },
@@ -123,16 +125,15 @@ export class Forum implements OnInit {
     this.router.navigate(['/create-post']);
   }
 
-  // Navigate to create page in reply mode
+  // Open thread page to read/write replies
   replyTo(post: Post): void {
-    // Pass original post info as URL parameters
-    this.router.navigate(['/create-post'], {
-      queryParams: {
-        replyToId: post.id,
-        replyToTitle: post.title,
-        replyToAuthor: post.author || ''
-      }
-    });
+    this.openThread(post);
+  }
+
+  // Navigate to thread page for a post
+  openThread(post: Post): void {
+    if (!post.id) return;
+    this.router.navigate([`/post/${post.id}`]);
   }
 
   // Navigate to create page in edit mode
@@ -160,6 +161,12 @@ export class Forum implements OnInit {
     if (!parent) return replyToId != null ? `#${replyToId}` : '';
     const author = parent.author || 'unknown';
     return `#${parent.id} (${author})`;
+  }
+
+  // Get number of replies for a post
+  getReplyCount(postId: number | undefined): number {
+    if (!postId) return 0;
+    return this.allPosts().filter(p => p.replyToId === postId).length;
   }
 
   // Check if current user can edit/delete this post
